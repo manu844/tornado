@@ -489,10 +489,18 @@ class HTTPRequest(object):
             self._cookies = Cookie.SimpleCookie()
             if "Cookie" in self.headers:
                 try:
-                    self._cookies.load(
-                        native_str(self.headers["Cookie"]))
+                    parsed = httputil.parse_cookie(self.headers["Cookie"])
                 except Exception:
-                    self._cookies = {}
+                    pass
+                else:
+                    for k, v in parsed.items():
+                        try:
+                            self._cookies[k] = v
+                        except Exception:
+                            # SimpleCookie imposes some restrictions on keys;
+                            # parse_cookie does not. Discard any cookies
+                            # with disallowed keys.
+                            pass
         return self._cookies
 
     def write(self, chunk, callback=None):
