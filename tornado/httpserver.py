@@ -489,7 +489,9 @@ class HTTPRequest(object):
             self._cookies = Cookie.SimpleCookie()
             if "Cookie" in self.headers:
                 try:
-                    parsed = httputil.parse_cookie(self.headers["Cookie"])
+                    parsed = httputil.parse_cookie(
+                        native_str(self.headers["Cookie"])
+                    )
                 except Exception:
                     pass
                 else:
